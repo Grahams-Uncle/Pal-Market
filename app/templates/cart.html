@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shopping Cart</title>
+  <style>
+    body, h1, ul, li, div {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      font-family: Arial, sans-serif;
+    }
+    .nav-bar {
+      display: flex;
+      justify-content: space-around;
+      padding: 10px;
+      background: #f0f0f0;
+      color: inherit;
+    }
+    .nav-bar button {
+      padding: 10px;
+      border: none;
+      background: none;
+      font-size: 1em;
+    }
+    .nav-bar button:hover {
+      background-color: #727272;
+    }
+    .container {
+      padding: 20px;
+    }
+    .cart-item-list {
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      margin-top: 20px;
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .cart-item-list th, .cart-item-list td {
+      text-align: left;
+      padding: 10px;
+      border-bottom: 1px solid #ddd;
+    }
+    thead th {
+      background-color: #004D99;
+      color: white;
+    }
+    .product-image img {
+      max-width: 100px; /* Limits image width to 100px */
+      height: auto; /* Keeps the aspect ratio */
+      display: block; /* Ensures no extra space at bottom */
+    }
+    .submit-buttons {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="nav-bar">
+    <a href="/" class="nav-bar button">Home</a>
+    <a href="/Sellers" class="nav-bar button">Sellers</a>
+    <a href="/Products" class="nav-bar button">Products</a>
+    <a href="/cart" class="nav-bar button">Shopping Cart</a>
+    <a href="/Profile" class="nav-bar button">Profile</a>
+  </div>
+
+  <div class="container">
+    <h3>Cart Items</h3>
+      <table class="cart-item-list">
+        <thead>
+          <tr>
+            <th>Select</th>
+            <th>Product Name</th>
+            <th>Product Image</th>
+            <th>Quantity</th>
+            <th>Price</th>
+            <th>Total Price</th>
+            <th>Added to Cart Time</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for cart_item in cart_items %}
+        <form action="{{ url_for('cart.submit_part_of_cart') }}" method="POST">
+          <tr>
+            <td>
+              <input type="checkbox" name="cart_item_ids[]" value="{{ cart_item.cart_item_id }}">
+            </td>
+            <td>{{ cart_item.product_name }}</td>
+            <td class="product-image">
+              <img src="{{ url_for('static', filename=cart_item.product_image) }}" alt="Product Image">
+            </td>
+            <td>
+              <input type="number" name="quantity" value="{{ cart_item.quantity }}" min="1">
+              <input type="hidden" name="cart_item_id" value="{{ cart_item.cart_item_id }}">
+              <input type="hidden" name="total_price" value="{{ cart_item.total_price }}">
+            </td>
+            <td>{{ cart_item.price }}</td>
+            <td>{{ cart_item.total_price }}</td>
+            <td>{{ cart_item.added_to_cart_time.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+            <td>
+              <button type="submit" formaction="{{ url_for('cart.change_quantity') }}" class="btn btn-primary">Update</button>
+              <button type="submit" formaction="{{ url_for('cart.remove_item', cart_item_id=cart_item.cart_item_id) }}" class="btn btn-danger">Remove</button>
+            </td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+      <div class="submit-buttons">
+        <button type="submit" class="btn btn-success">Submit Selected Items</button> 
+      </div>
+    </form>
+  </div>
+</body>
+</html>

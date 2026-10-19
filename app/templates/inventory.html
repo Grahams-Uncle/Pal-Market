@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sellers Page</title>
+<style>
+  /* Basic Reset */
+  body, h1, ul, li, div {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      font-family: Arial, sans-serif;
+  }
+
+  /* Styling for the top navigation bar */
+  .nav-bar {
+      display: flex;
+      justify-content: space-around;
+      padding: 10px;
+      background: #f0f0f0;
+      text-decoration: none;
+      color: inherit;
+  }
+
+  .nav-bar button {
+      padding: 10px;
+      border: none;
+      background: none;
+      font-size: 1em;
+  }
+
+  .nav-bar.button:hover {
+      background-color: #727272; /* Darkens button on hover */
+  }
+
+  .bottom th, .bottom td {
+    text-align: left;
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+  }
+  .seller-list h3 {
+    margin-left: 10px; /* Adds margin to the right of the label */
+  }
+
+  .container  .left {
+    border: 1px solid #ddd;
+    padding: 10px;
+    margin-right: 20px;
+  }
+
+  .container .right {
+    padding: 10px;
+    border: 1px solid #ddd; 
+  }
+
+  .container {
+    display: flex;
+    justify-content: space-between;
+    padding: 20px;
+    flex-wrap: wrap; /* Allows elements to wrap, making the bottom element sit underneath */
+  }
+
+  .left, .right {
+    flex: 1; /* Makes left and right take up equal space */
+    min-width: 250px; /* Prevents the sections from getting too narrow */
+  }
+
+  .bottom {
+    width: 100%; /* Ensures the bottom section spans the full width of the container */
+    border: 1px solid #ddd; /* Styling for visibility */
+    text-align: center; /* Center-aligns the text within the bottom section */
+    margin-top: 20px;
+    padding: 10px;
+  }
+  .bottom table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    justify-content: space-between;
+    text-align: center; /* Center-aligns the text within the bottom section */
+  }
+  .pagination {
+    display: flex;
+    justify-content: center; /* This centers the flex items horizontally */
+    align-items: center; /* This centers the flex items vertically (if needed) */
+    flex-wrap: wrap; /* This allows items to wrap onto multiple lines */
+    gap: 10px; /* Optional: adds space between items */
+  }
+
+  thead th {
+    background-color: #004D99; /* Dark blue background */
+    color: white; /* White text color */
+    padding: 10px; /* Optional: Adds padding to make the header taller */
+  }
+</style>
+</head>
+<body>
+
+<div class="nav-bar">
+  <a href="/" class="nav-bar button">Home</a>
+  <a href="/Sellers" class="nav-bar button">Sellers</a>
+  <a href="/Products" class="nav-bar button">Products</a>
+  <a href="/cart" class="nav-bar button">Shopping Cart</a>
+  <a href="/Profile" class="nav-bar button">Profile</a>
+</div>
+
+<!-- Seller Info -->
+<div class="seller-info">
+    <div class="container">
+        <div class="left">
+          <h2>Seller Info</h2>
+          <h4>Name: {{seller_info.firstname}} {{seller_info.lastname}}</h4>
+          <h4>City: {{seller_info.ship_address.city_name}}</h4>
+          <h4>State: {{seller_info.ship_address.state}}</h4>
+          <h4>Zipcode: {{seller_info.ship_address.zipcode}}</h4>
+        </div>
+    
+        <div class="right">
+          <h2>Seller Bio</h2>
+            {% if seller_info.user_bio != None%}
+                {{seller_info.bio}}
+            {% else %}
+                The seller has nothing to say...
+            {% endif %}
+            <h2>Seller Rating: {{seller_info.rating}}</h2>
+        </div>
+        <div class="bottom">
+            <h2>Seller's Products</h2>
+            <form method="GET" action="{{ url_for('products.search_product') }}" class="search-filter-form">
+              <div class="form-row">
+                <!-- Search by name -->
+                <div class="col">
+                  <input type="text" class="form-control" placeholder="Search by name" name="search_term" value="{{ request.args.get('search_term', '') }}" style="margin: auto; margin-bottom: 10px;">
+                </div>
+                <div class="col" style="display: none;">
+                  <input type="text" class="form-control" placeholder="Search by seller name" name="seller_search" value="{{ seller_info.firstname + ' ' + seller_info.lastname }}">
+                </div>
+              </div>
+            
+              <div class="form-row" style="margin-bottom: 10px;">
+                <label for="product_category" style="display: flex; align-items: center;">Filter by:</label>
+                <!-- Filter by category -->
+                <div class="col">
+                  <select class="form-control" name="product_category">
+                    <option value="" selected>All Categories</option>
+                    {% for catkey, name in categories %}
+                    <option value="{{ catkey }}">{{ name }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+                <!-- Filter by price -->
+                <div class="col">
+                  <input type="number" class="form-control" placeholder="Max price" name="max_price" value="{{ request.args.get('max_price', '') }}">
+                </div>
+              </div>
+            
+              <div class="form-row sort-section">
+                <label for="sort_by" style="display: flex; align-items: center;">Sort by:</label>
+                <div class="col">
+                  <select class="form-control" name="sort_by" id="sort_by">
+                    <option value="product_name" selected>Product Name</option>
+                    <option value="product_price">Price</option>
+                  </select>
+                </div>
+                <div class="col">
+                  <select class="form-control" name="order" id="order">
+                    <option value="asc" selected>Ascending</option>
+                    <option value="desc">Descending</option>
+                  </select>
+                </div>
+              </div>
+            
+              <!-- <input type="reset" value="Reset"> -->
+              <button type="submit" class="btn btn-primary btn-block btn-block-search" style="width: 50%; margin: 0 auto; margin-top: 10px;">Search</button>
+            </form>
+            {% if seller_products != None%}
+            <table>
+                <tr>
+                <thead>
+                  <th>Product Name</th>
+                  <th></th>
+                  <th>Price</th>
+                  <th>Rating</th>
+                  <th>Quantity</th>
+                </thead>
+                </tr>
+                <tbody>
+                        {% for product in seller_products %}
+                            <tr>
+                                <td><a href="{{ url_for('products.curproduct', product_key=product.product_key) }}">{{ product.product_name }}</a></td> 
+                                <td>
+                                  <a href="{{ url_for('products.curproduct', product_key=product.product_key) }}">
+                                    <img src="{{ url_for('static', filename=product.image) }}" alt="{{ product.product_name }}" class="img-thumbnail" style="max-width: 100px;">
+                                  </a>
+                                </td>         
+                                <td> ${{ product.product_price }} </td>
+                                <td>{{ "{:.2f}".format(product.product_rating) }}</td>
+                                <td> {{ product.quantity }} </td>
+                            </tr>
+                        {% endfor %}
+                  </tbody>
+              </table>
+              <div class="pagination">
+                {% if seller_current_page > 1 %}
+                    <a href="?prod_page={{ seller_current_page - 1 }}">Previous</a>
+                {% else %}
+                    <a>Previous</a>
+                {% endif %}
+                {% for num in range(1, seller_total_pages + 1) %}
+                    {% if num == seller_current_page %}
+                        <span>{{ num }}</span>
+                    {% else %}
+                        <a href="?prod_page={{ num }}">{{ num }}</a>
+                    {% endif %}
+                {% endfor %}
+                {% if seller_current_page < seller_total_pages %}
+                    <a href="?prod_page={{ seller_current_page + 1 }}">Next</a>
+                {% else %}
+                    <a>Next</a>
+                {% endif %}
+              </div>
+            {% else %}
+                <h4>Seller has not post anything...</h4>
+            {% endif %}
+        </div>
+        <div class="bottom">
+            <h2>Seller's Reviews</h2>
+            <table>
+              <thead>
+                  <tr>
+                    <th>Product Name</th>
+                    <th>Rating</th>
+                    <th>Description</th>
+                  </tr>
+              </thead>
+              <tbody>
+                {% for seller_review in seller_reviews %}
+                  <tr>
+                    <td>{{ seller_review.product_name }}</td>
+                    <td>{{ seller_review.review_rating }}</td>
+                    <td>{{ seller_review.review_description }}</td>
+                  </tr>
+                {% endfor %}
+              </tbody>        
+            </table>
+            <div class="pagination">
+              {% if review_current_page > 1 %}
+                  <a href="?review_page={{ review_current_page - 1 }}">Previous</a>
+              {% else %}
+                  <a>Previous</a>
+              {% endif %}
+              {% for num in range(1, review_total_pages + 1) %}
+                  {% if num == review_current_page %}
+                      <span>{{ num }}</span>
+                  {% else %}
+                      <a href="?review_page={{ num }}">{{ num }}</a>
+                  {% endif %}
+              {% endfor %}
+              {% if review_current_page < review_total_pages %}
+                  <a href="?review_page={{ review_current_page + 1 }}">Next</a>
+              {% else %}
+                  <a>Next</a>
+              {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

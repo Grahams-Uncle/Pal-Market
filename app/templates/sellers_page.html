@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ho+j7jyWK8fNQe+A12Hb8AhRq26LrZ/JpcUGGOn+Y7RsweNrtN/tE3MoK7ZeZDyx" crossorigin="anonymous"></script>
+  </head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sellers Page</title>
+<style>
+  /* Basic Reset */
+  body, h1, ul, li, div {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      font-family: Arial, sans-serif;
+  }
+
+  /* Styling for the top navigation bar */
+  .nav-bar {
+      display: flex;
+      justify-content: space-around;
+      padding: 10px;
+      background: #f0f0f0;
+      text-decoration: none;
+      color: inherit;
+  }
+
+  .nav-bar button {
+      padding: 10px;
+      border: none;
+      background: none;
+      font-size: 1em;
+  }
+
+  .nav-bar.button:hover {
+      background-color: #727272; /* Darkens button on hover */
+  }
+
+  /* Styling for the search and seller list container */
+  .container {
+    padding: 20px;
+  }
+
+  /* Styling for the search box */
+  .search-box {
+    display: flex;
+    justify-content: start;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+
+  .search-box input {
+    padding: 10px;
+    margin-left: 10px;
+    margin-right: 10px; /* Spacing between the input and the search button */
+    border: 1px solid #ddd;
+    flex-grow: 1; /* Allows input to grow and fill the space */
+    max-width: 300px; /* Maximum width for the input */
+  }
+
+  /* Styling for the seller list */
+  .seller-list {
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 10px;
+  }
+
+  .seller-list button {
+    margin: 5px;
+    padding: 5px 10px;
+    border: 1px solid #ddd;
+  }
+
+  .seller-list table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+  }
+
+  .seller-list th, .seller-list td {
+    text-align: left;
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+  }
+
+  thead th {
+    background-color: #004D99; /* Dark blue background */
+    color: white; /* White text color */
+    padding: 10px; /* Optional: Adds padding to make the header taller */
+  }
+
+  .pagination {
+      display: flex;
+      justify-content: center; /* This centers the flex items horizontally */
+      align-items: center; /* This centers the flex items vertically (if needed) */
+      flex-wrap: wrap; /* This allows items to wrap onto multiple lines */
+      gap: 10px; /* Optional: adds space between items */
+  }
+
+
+  .dropdown:hover > .dropdown-menu, .dropend:hover > .dropdown-menu{
+  display: block;
+  margin-top: .125em;
+  margin-left: .125em;
+}
+
+  .dropend:hover > .dropdown-menu {
+    position: absolute;
+    top: 0;
+    left: 100%;
+  }
+
+  .dropdown .dropdown-menu {
+    display: none;
+  }
+  .dropend .dropdown-toggle::after {
+    content: "\25B6"; /* Unicode character for right-pointing arrow */
+    border: none;
+    vertical-align: middle;
+    margin-left: 0.5em;
+    font-size: 0.6em;
+  }
+  .selected {
+    background-color: #55ae46;
+    color: #fff;
+  }
+</style>
+</head>
+<body>
+
+  <div class="nav-bar">
+    <a href="/" class="nav-bar button">Home</a>
+    <a href="/Sellers" class="nav-bar button">Sellers</a>
+    <a href="/Products" class="nav-bar button">Products</a>
+    <a href="/cart" class="nav-bar button">Shopping Cart</a>
+    <a href="/Profile" class="nav-bar button">Profile</a>
+  </div>
+
+  <div class="container">
+  <div class="seller-list">
+    <label for="seller-list"><h3>Sellers</h3></label><br>
+    <div class="dropdown" style="display: inline-block;">
+      <a class="btn btn-secondary dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" id="sort_dropdown" >
+        Sort By
+      </a>
+      <div class="dropdown-menu" aria-labelledby="sort_dropdown">
+        <a class="dropdown-item" href="?seller_sort=name_asc&rating_filter={{rating_filter}}&selected_state={{state_filter}}">Name: A to Z</a>
+        <a class="dropdown-item" href="?seller_sort=name_desc&rating_filter={{rating_filter}}&selected_state={{state_filter}}">Name: Z to A</a> 
+        <a class="dropdown-item" href="?seller_sort=rating_asc&rating_filter={{rating_filter}}&selected_state={{state_filter}}">Rating: Low to High</a>
+        <a class="dropdown-item" href="?seller_sort=rating_desc&rating_filter={{rating_filter}}&selected_state={{state_filter}}">Rating: High to Low</a> 
+        <a class="dropdown-item" href="?seller_sort=sold_asc&rating_filter={{rating_filter}}&selected_state={{state_filter}}">Items Sold: Low to High</a>
+        <a class="dropdown-item" href="?seller_sort=sold_desc&rating_filter={{rating_filter}}&selected_state={{state_filter}}">Items Sold: High to Low</a> 
+      </div>
+    </div>
+
+    <div class="dropdown" style="display: inline-block;">
+      <a class="btn btn-secondary dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+        Filter By
+      </a>
+      <ul class="dropdown-menu">
+        <li class="nav-item dropend">
+          <a class="nav-link dropdown-toggle " href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            Rating
+          </a>
+          <ul class="dropdown-menu">
+            <a class="dropdown-item" href="?rating_filter=0&seller_sort={{seller_sort}}&selected_state={{state_filter}}">All</a>
+            <a class="dropdown-item" href="?rating_filter=1&seller_sort={{seller_sort}}&selected_state={{state_filter}}">1 & Up</a>
+            <a class="dropdown-item" href="?rating_filter=2&seller_sort={{seller_sort}}&selected_state={{state_filter}}">2 & Up</a> 
+            <a class="dropdown-item" href="?rating_filter=3&seller_sort={{seller_sort}}&selected_state={{state_filter}}">3 & Up</a>
+            <a class="dropdown-item" href="?rating_filter=4&seller_sort={{seller_sort}}&selected_state={{state_filter}}">4 & Up</a> 
+          </ul>
+        </li>
+      
+        <li class="nav-item dropend">
+          <a class="nav-link dropdown-toggle " href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            State
+          </a>
+          <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink" style="max-height: 500px; overflow-y: auto;">
+            <a class="dropdown-item {% if state_filter== 'all' %} selected {% endif %}" href="?rating_filter={{rating_filter}}&seller_sort={{seller_sort}}&selected_state=all">All States</a>
+            {% for state in all_states %}
+              <a class="dropdown-item {% if state_filter== state[0] %} selected {% endif %}" href="?rating_filter={{rating_filter}}&seller_sort={{seller_sort}}&selected_state={{state[0]}}">{{state[0]}}</a>
+            {% endfor %}
+          </ul>
+        </li>
+      </ul>
+    </div>
+    <table>
+      <tr>
+        <thead>
+          <th>Seller Name</th>
+          <th>Location</th>
+          <th>Rating</th>
+          <th>Items Sold</th>
+        </thead>
+      </tr>
+      <tbody>
+        {% for seller in sellers %}
+          <tr>
+            <td>
+              <a href="{{ url_for('sellers.seller_items', seller_id=seller.id) }}">{{ seller.name }}</a>
+            </td>
+            <td>{{ seller.city }}, {{ seller.state }}</td>
+            <td>{{ "{:.2f}".format(seller.user_rating) }}</td>
+            <td>{{ seller.item_sold }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <div class="pagination">
+    {% if current_page > 1 %}
+        <a href="?page={{ current_page - 1 }}&rating_filter={{rating_filter}}&seller_sort={{seller_sort}}&selected_state={{state_filter}}">Previous</a>
+    {% else %}
+        <a>Previous</a>
+    {% endif %}
+    {% for num in range(1, total_pages + 1) %}
+        {% if num == current_page %}
+            <span>{{ num }}</span>
+        {% else %}
+            <a href="?page={{ num }}&rating_filter={{rating_filter}}&seller_sort={{seller_sort}}&selected_state={{state_filter}}">{{ num }}</a>
+        {% endif %}
+    {% endfor %}
+    {% if current_page < total_pages %}
+        <a href="?page={{ current_page + 1 }}&rating_filter={{rating_filter}}&seller_sort={{seller_sort}}&selected_state={{state_filter}}">Next</a>
+    {% else %}
+        <a>Next</a>
+    {% endif %}
+</div>
+</div>
+
+</body>
+</html>

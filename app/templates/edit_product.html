@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Product</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* Basic Reset */
+        body, h1, ul, li, div {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+            font-family: Arial, sans-serif;
+        }
+
+        /* Styling for the top navigation bar */
+        .nav-bar {
+            display: flex;
+            justify-content: space-around;
+            padding: 10px;
+            background: #f0f0f0;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .nav-bar button {
+            padding: 10px;
+            border: none;
+            background: none;
+            font-size: 1em;
+        }
+
+        .nav-bar.button:hover {
+            background-color: #727272; /* Darkens button on hover */
+        }
+        .container {
+            display: flex;
+            justify-content: center; /* Center items horizontally */
+            align-items: center; /* Center items vertically */
+            padding: 20px;
+            flex-wrap: wrap; /* Allows elements to wrap, making the bottom element sit underneath */
+            width: 100%;
+        }
+        .btn-convert {
+            background-color: #28a745;
+        }
+        .btn-confirm {
+            background-color: #007bff;
+        }
+        .btn-logout {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            background-color: #dc3545;
+            color: white;
+            border-radius: 5px;
+            border: none;
+        }
+        .alert-error {
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+            color: #721c24;
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+        .chart-container {
+            flex: 1;
+            margin-left: 50px;
+        }
+        .btn-profile {
+            position: fixed;
+            bottom: 20px;
+            right: 150px;
+            padding: 10px 20px;
+            background-color: #004D99; /* Bootstrap success color */
+            color: white;
+            border-radius: 5px;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="nav-bar">
+        <a href="/" class="nav-bar button">Home</a>
+        <a href="/Sellers" class="nav-bar button">Sellers</a>
+        <a href="/Products" class="nav-bar button">Products</a>
+        <a href="/cart" class="nav-bar button">Shopping Cart</a>
+        <a href="/Profile" class="nav-bar button">Profile</a>
+    </div>
+    <div class="container">
+        <form method="POST" action="{{ url_for('sellers.edit_product', product_id=product.product_key, seller_id=product.seller_key) }}">
+            {{ form.hidden_tag() }}
+            <div class="info-section">
+                <h3>Edit Product</h3>
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        <div class="container mt-4">
+                            {% for category, message in messages %}
+                                <div class="alert-error" role="alert">
+                                    {{ message }}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                {% endwith %}
+                <h5>Product Name: {{ product.product_name }}</h5>
+                <label for="product-cat" style="display: inline-block;"><h5>Product Category</h5></label>
+                <select class="form-control" id="product-cat" name="product_category" style="width: max-content; margin-top: 0px; margin-bottom: 10px;">
+                    {% for catkey, name in categories %}
+                        {% if product.cat_key == catkey %}
+                            <option value="{{ catkey }}" selected {% if selected_category == catkey %}selected{% endif %}>{{ name }}</option>
+                        {% else %}
+                            <option value="{{ catkey }}" {% if selected_category == catkey %}selected{% endif %}>{{ name }}</option>
+                        {% endif %}
+                    {% endfor %}
+                </select>
+                <div class="form-group">
+                    <label for="product-description"><h5>Product Description</h5></label>
+                    <textarea class="form-control" name="product_description" rows="5" cols="50" wrap="physical" id="product-description">{{ product.product_description }}</textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="product-price"><h5>Price</h5></label>
+                        <span class="form-control" style="border: 0px;">${{ product.product_price }}</span>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="product-quantity"><h5>Quantity</h5></label>
+                        {{ form.product_quantity(class="form-control", value=product.quantity) }}
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="discount-amount"><h5>Discount amount (optional)</h5></label>
+                    <select id="discount-amount" name="discount_amount" class="form-control" style="width: max-content;">
+                        <option value=1 {% if product.discount_amount==1 %}selected{% endif %}>No Discount</option>
+                        {% for i in range(95, 1, -5) %}
+                            {% if product.discount_amount is not none %}
+                                {% if product.discount_amount * 100 == i %}
+                                    <option value="{{ i/100 }}" selected>{{ i }} %</option>
+                                {% else %}
+                                    <option value="{{ i/100 }}">{{ i }} %</option>
+                                {% endif %}
+                            {% else %}
+                                <option value="{{ i/100 }}">{{ i }} %</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                </div>
+                {{ form.delete_submit(class="btn btn-danger", value="Delete", style="margin-right: 20px;") }}
+                {{ form.update_submit(class="btn btn-primary", value="Update") }}
+            </div>
+        </form>
+        <div class="chart-container">
+            <h3>Product Trends</h3>
+            <canvas id="salesTrendChart"></canvas>
+        </div>
+    </div>
+    <a href="/Profile" class="btn-profile">Back</a>
+    <a href="/logout" class="btn-logout">Logout</a>
+</body>
+<script>
+    // Get the trends data from the template
+    var trends = {{ trends|tojson }};
+
+    // Get the canvas element
+    var ctx = document.getElementById('salesTrendChart').getContext('2d');
+
+    // Create the chart
+    var chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: trends.months,
+            datasets: [{
+                label: 'Product {{product.product_name}} Trends',
+                data: trends.quantities,
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+</script>
+</html>

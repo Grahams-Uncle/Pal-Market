@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Home Page</title>
+<style>
+  /* Basic Reset */
+  body, h1, ul, li, div {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      font-family: Arial, sans-serif;
+  }
+
+  /* Styling for the top navigation bar */
+  .nav-bar {
+      display: flex;
+      justify-content: space-around;
+      padding: 10px;
+      background: #f0f0f0;
+      text-decoration: none;
+      color: inherit;
+  }
+
+  .nav-bar button {
+      padding: 10px;
+      border: none;
+      background: none;
+      font-size: 1em;
+  }
+
+  .nav-bar.button:hover {
+      background-color: #727272; /* Darkens button on hover */
+  }
+
+  .container {
+    margin-top: 100px;
+    padding: 150px;
+    display: flex;
+    justify-content: center;
+  }
+
+  .search-box {
+    display: flex;
+    justify-content: start;
+    align-items: center;
+  }
+
+  .search-box input {
+    padding: 10px 10px;
+    width: 400px;
+    margin-left: 10px;
+    margin-right: 10px; /* Spacing between the input and the search button */
+    border: 1px solid #ddd;
+    flex-grow: 1; 
+    max-width: 300px; /* Maximum width for the input */
+  }
+
+</style>
+</head>
+<body>
+
+  <div class="nav-bar">
+    <a href="/" class="nav-bar button">Home</a>
+    <a href="/Sellers" class="nav-bar button">Sellers</a>
+    <a href="/Products" class="nav-bar button">Products</a>
+    <a href="/cart" class="nav-bar button">Shopping Cart</a>
+    <a href="/Profile" class="nav-bar button">Profile</a>
+  </div>
+
+<div class="container">
+    <form method="GET" action="{{ url_for('products.search_product') }}" class="search-filter-form">
+      <div class="col">
+        <input type="text" class="form-control" placeholder="Search by product name" name="search_term" value="{{ request.args.get('search_term', '') }}">
+      </div>
+      <div class="col">
+        <input type="text" class="form-control" placeholder="Search by seller name" name="seller_search" value="{{ request.args.get('seller_search', '') }}">
+      </div>
+      <div class="col">
+        <button type="submit" class="btn btn-primary btn-block btn-block-search">Search</button>
+      </div>
+    </form>
+
+</div>
+</body>
+</html>

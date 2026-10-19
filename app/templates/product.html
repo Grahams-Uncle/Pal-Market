@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Products Page</title>
+<style>
+  /* Basic Reset */
+  body, h1, ul, li, div {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      font-family: Arial, sans-serif;
+  }
+
+  /* Styling for the top navigation bar */
+  .nav-bar {
+      display: flex;
+      justify-content: space-around;
+      padding: 10px;
+      background: #f0f0f0;
+      text-decoration: none;
+      color: inherit;
+  }
+
+  .nav-bar button {
+      padding: 10px;
+      border: none;
+      background: none;
+      font-size: 1em;
+  }
+
+  .nav-bar.button:hover {
+      background-color: #727272; /* Darkens button on hover */
+  }
+
+  /* Styling for the search and seller list container */
+  .container {
+    padding: 20px;
+    text-align:center;
+  }
+
+  /* Styling for the search box */
+  .search-box {
+    display: flex;
+    justify-content: start;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+
+  .search-box input {
+    padding: 10px;
+    margin-left: 10px;
+    margin-right: 10px; /* Spacing between the input and the search button */
+    border: 1px solid #ddd;
+    flex-grow: 1; /* Allows input to grow and fill the space */
+    max-width: 300px; /* Maximum width for the input */
+  }
+
+  /* Styling for the seller list */
+  .product-list {
+    border: 1px solid #ddd;
+    border-radius: 5px;
+  }
+
+  .product-list button {
+    margin: 5px;
+    padding: 5px 10px;
+    border: 1px solid #ddd;
+  }
+
+  .product-list table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+  }
+
+  .product-list th, .product-list td {
+    text-align: left;
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+  }
+
+  thead th {
+    background-color: #004D99; /* Dark blue background */
+    color: white; /* White text color */
+    padding: 10px; /* Optional: Adds padding to make the header taller */
+  }
+
+
+</style>
+</head>
+<body>
+
+  <div class="nav-bar">
+    <a href="/" class="nav-bar button">Home</a>
+    <a href="/Sellers" class="nav-bar button">Sellers</a>
+    <a href="/Products" class="nav-bar button">Products</a>
+    <a href="/cart" class="nav-bar button">Shopping Cart</a>
+    <a href="/Profile" class="nav-bar button">Profile</a>
+  </div>
+
+<div class="container">
+  <h3>Search Products</h3>
+
+  <div class="product-list">
+    <label for="product-list"><h3>Products</h3></label>
+    <form method="GET" action="{{ url_for('products.search_product') }}" class="search-filter-form">
+      <div class="form-row">
+        <!-- Search by name -->
+        <div class="col">
+          <input type="text" class="form-control" placeholder="Search by name" name="search_term" value="{{ request.args.get('search_term', '') }}">
+        </div>
+        <div class="col">
+          <input type="text" class="form-control" placeholder="Search by seller name" name="seller_search" value="{{ request.args.get('seller_search', '') }}">
+        </div>
+        <!-- Filter by category -->
+        <div class="col">
+          <select class="form-control" name="product_category">
+            <option value="">All Categories</option>
+            {% for catkey, name in categories %}
+              <option value="{{ catkey }}" {% if request.args.get('product_category')|string == catkey|string %}selected{% endif %}>{{ name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <!-- Filter by price -->
+        <div class="col">
+          <input type="number" class="form-control" placeholder="Max price" name="max_price" value="{{ request.args.get('max_price', '') }}">
+        </div>
+      </div>
+      <br>
+      <div class="form-row sort-section">
+        <div class="col">
+          <select class="form-control" name="sort_by">
+            <option value="product_price" {% if request.args.get('sort_by') == 'product_price' %}selected{% endif %}>Price</option>
+            <option value="cat_key" {% if request.args.get('sort_by') == 'cat_key' %}selected{% endif %}>Category Key</option>
+            <option value="product_key" {% if request.args.get('sort_by') == 'product_key' %}selected{% endif %}>Product Key</option>
+            <option value="product_name" {% if request.args.get('sort_by') == 'product_name' %}selected{% endif %}>Product Name</option>
+          </select>
+        </div>
+
+        <div class="col">
+          <select class="form-control" name="order">
+            <option value="Descending" {% if request.args.get('order') == 'desc' %}selected{% endif %}>Descending</option>
+            <option value="Ascending" {% if request.args.get('order') == 'asc' %}selected{% endif %}>Ascending</option>
+          </select>
+        </div>
+        <div class="col">
+          <input type="number" class="form-control" placeholder="Filter by top k" name = "topk1" value="{{ request.args.get('topk1', '') }}">
+        </div>
+      </div>
+
+      <!-- <input type="reset" value="Reset"> -->
+      <button type="submit" class="btn btn-primary btn-block btn-block-search">Search</button>
+    </form>
+    {% if flag %}
+      <a href="{{ url_for('sellers.post_product', seller_id=curuser.id) }}">
+        <button class="btn btn-secondary" style="margin-right: 1em;">Add Product</button>
+      </a>
+    {% endif %}
+
+    
+    <table>
+      <tr>
+        <thead>
+        <th>Product Name</th>
+        <th> Image </th>
+        <th>Product Key</th>
+        <th> Category Key </th>
+        <th>Price</th>
+        <th>Rating</th>
+        </thead>
+      </tr>
+      <tbody>
+        {% for product in products %}
+            <tr>
+                <td>
+                  <a href="{{ url_for('products.curproduct', product_key=product.product_key) }}">{{ product.product_name }}</a>
+                </td>   
+                <td>
+                  <a href="{{ url_for('products.curproduct', product_key=product.product_key) }}">
+                    <img src="{{ url_for('static', filename=product.product_image) }}" alt="{{ product.product_name }}" class="img-thumbnail" style="max-width: 100px;">
+                  </a>
+                </td>
+                <td> {{ product.product_key}} </td>   
+                <td> {{ product.cat_key }} </td> 
+                <td> {{ product.product_price }} </td>
+                <td> {{ product.product_rating }} </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+  </div>
+</div>
+<div class="text-center my-4">
+  {% if curpage > 1 %}
+      <a href="{{ url_for('products.search_product', curpage=curpage-1, search_term=request.args.get('search_term', ''), seller_search=request.args.get('seller_search', ''), product_category=request.args.get('product_category', ''), max_price=request.args.get('max_price', ''), available=request.args.get('available', ''), sort_by=request.args.get('sort_by', 'price'), order=request.args.get('order', 'desc'), min_avg_rating=request.args.get('min_avg_rating', '')) }}">Previous</a>
+  {% endif %}
+  <span>Page {{ curpage }} of {{ totalpage }}</span>
+  {% if curpage < totalpage %}
+      <a href="{{ url_for('products.search_product', curpage=curpage+1, search_term=request.args.get('search_term', ''), seller_search=request.args.get('seller_search', ''), product_category=request.args.get('product_category', ''), max_price=request.args.get('max_price', ''), available=request.args.get('available', ''), sort_by=request.args.get('sort_by', 'price'), order=request.args.get('order', 'desc'), min_avg_rating=request.args.get('min_avg_rating', '')) }}">Next</a>
+  {% endif %}
+
+  <!-- Jump to Page Form -->
+  <form action="{{ url_for('products.search_product') }}" method="GET" style="margin-top: 20px;">
+    <input type="number" name="curpage" min="1" max="{{ totalpage }}" placeholder="Go to page" required>
+    <input type="hidden" name="search_term" value="{{ request.args.get('search_term', '') }}">
+    <input type="hidden" name="seller_search" value="{{ request.args.get('seller_search', '') }}">
+    <input type="hidden" name="product_category" value="{{ request.args.get('product_category', '') }}">
+    <input type="hidden" name="max_price" value="{{ request.args.get('max_price', '') }}">
+    <input type="hidden" name="sort_by" value="{{ request.args.get('sort_by', '') }}">
+    <input type="hidden" name="order" value="{{ request.args.get('order', '') }}">
+    <input type="hidden" name="topk1" value="{{ request.args.get('topk1', '') }}">
+    <button type="submit" class="btn btn-primary">Go</button>
+  </form>
+</div>
+</body>
+</html>

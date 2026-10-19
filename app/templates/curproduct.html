@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+    .product-detail-container {
+        text-align: center;
+        max-width: 800px;
+        margin: auto;
+        padding: 20px;
+    }
+    .product-image {
+        border: 1px solid #ddd;
+        padding: 10px;
+        display: inline-block;
+    }
+    .product-image img {
+        max-width: 100%;
+        height: auto;
+        display: block;
+        margin: auto;
+    }
+    .product-price, .product-description {
+        margin: 20px 0;
+    }
+    .sellers-list, .reviews-section {
+        margin-top: 30px;
+        border-top: 1px solid #eee;
+        padding-top: 20px;
+    }
+    .seller-item, .review-item {
+        margin-bottom: 20px;
+        padding: 10px;
+        border: 1px solid #eee;
+        border-radius: 8px;
+    }
+    .btn-add-to-cart {
+        background-color: #007bff;
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        margin-top: 10px;
+        border-radius: 5px;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: background-color 0.2s ease-in-out;
+    }
+    .btn-add-to-cart:hover {
+        background-color: #0056b3;
+    }
+    .review-rating {
+        font-weight: bold;
+        color: rgb(0, 255, 68);
+        margin-bottom: 5px;
+    }
+    .reviewer-details {
+        font-size: 0.8rem;
+        color: #666;
+        margin-top: 10px;
+    }
+</style>
+
+<h1> </h1>
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <ul class=flashes>
+    {% for message in messages %}
+      <li>{{ message }}</li>
+    {% endfor %}
+    </ul>
+  {% endif %}
+{% endwith %}
+
+<div class="product-detail-container">
+    {% for product in selected_product %}
+        <h2 class="product-name">{{ product.product_name }}</h2>
+        <img src="{{ url_for('static', filename=product.product_image) }}" alt="{{ product.product_name }}" class="img-thumbnail" style="max-width: 100px;">
+        <!-- <div class="product-price">Price: ${{ product.product_price }}</div> -->
+        <div class="product-description">{{ product.product_description }}</div>
+        {% for c in category %}
+            <p>Category: {{ c.cat_name }}</a></p>
+        {% endfor %}
+        <!-- ... other product details ... -->
+    <div class="sellers-list">
+        <h3>Available from Seller:</h3>
+        {% for sid, sellerfirst, sellerlast, quantity, price in sellers_stock %}
+            <div class="seller-item">
+                <p>Seller: <a href="{{ url_for('sellers.seller_items', seller_id=sid) }}">{{ sellerfirst ~ ' ' ~ sellerlast }}</a> - In Stock: {{ quantity }}, Price per item: {{price}}</p>
+                <form action="{{ url_for('products.add_to_cart') }}" method="post" class="add-to-cart-form">
+                    <input type="hidden" name="product_key" value="{{ product.product_key }}">
+                    <input type="hidden" name="seller_id" value="{{ sid }}">
+                    <input type="hidden" name="price1" value="{{ price }}">
+                    <br><label for="discount_code">Discount Code</label><br>
+                    <input type="number" name="discount_code" id="discount_code">
+                    <br><label for="quantity">Quantity</label><br>
+                    <input type="number" name="quantity" min="1" max="{{ quantity }}" required>
+                    <br><button type="submit" class="btn-add-to-cart">Add to Cart</button><br>
+                </form>
+            </div>
+        {% endfor %}
+    </div>
+    <div class="text-center my-4">
+        {% if curpage > 1 %}
+        <a href="?curpage={{ curpage - 1 }}">Previous</a>
+        {% endif %}
+        <span>Page {{ curpage }} of {{ totalpage }}</span>
+        {% if curpage < totalpage %}
+        <a href="?curpage={{ curpage + 1 }}">Next</a>
+        {% endif %}
+    <div>
+    {% endfor %}
+   
+    <div class="reviews-section">
+        <h3>Reviews:</h3>
+
+            <div class="avg-review">
+                <!-- calculate average rating for product -->
+                <div class="review-rating">Average Rating: {{ avgreview[0]}} </div>
+                <!-- share # of reviews -->
+                <div class="review-rating"># of Reviews: {{avgreview[1]}}</div>
+                
+            </div>
+            
+            {% for review in selected_reviews %}
+            <div class="review-item">
+                <div class="review-text">Rating: {{ review.review_rating }}</div>
+                <div class="review-text">{{ review.review_description }}</div>
+                <div class="reviewer-details">Reviewed by: {{ review.firstname }} {{ review.lastname }}</div>
+             <!-- ability to up vote, and the total upvotes displayed -->
+            </div>
+            {% endfor %}
+    </div>
+    <div class="text-center my-4">
+        {% if curpagereview > 1 %}
+        <a href="?curpagereview={{ curpagereview - 1 }}">Previous</a>
+        {% endif %}
+        <span>Page {{ curpagereview }} of {{ totalpagereview }}</span>
+        {% if curpagereview < totalpagereview %}
+        <a href="?curpagereview={{ curpagereview + 1 }}">Next</a>
+        {% endif %}
+    <div>
+</div>
+
+<div class="text-center prodret">
+    <a href="{{ url_for('products.search_product') }}" class="btn btn-primary">Back to Products</a>
+    <a href="{{ url_for('index.index') }}" class="btn btn-primary">Back to Home</a>
+  </div>

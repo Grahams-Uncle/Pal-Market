@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+</head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Product</title>
+    <style>
+        /* Basic Reset */
+        body, h1, ul, li, div {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+            font-family: Arial, sans-serif;
+        }
+
+        /* Styling for the top navigation bar */
+        .nav-bar {
+            display: flex;
+            justify-content: space-around;
+            padding: 10px;
+            background: #f0f0f0;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .nav-bar button {
+            padding: 10px;
+            border: none;
+            background: none;
+            font-size: 1em;
+        }
+
+        .nav-bar.button:hover {
+            background-color: #727272; /* Darkens button on hover */
+        }
+        .container {
+            display: flex;
+            justify-content: left; /* Center items horizontally */
+            align-items: left; /* Center items vertically */
+            padding: 20px;
+            flex-wrap: wrap; /* Allows elements to wrap, making the bottom element sit underneath */
+            width: 100%;
+        }
+        .btn-save, .btn-convert, .btn-confirm {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            margin-top: 20px;
+            text-align: center;
+            color: white;
+            border-radius: 5px;
+            border: none;
+        }
+        .btn-save {
+            background-color: #007bff;
+        }
+        .btn-convert {
+            background-color: #28a745;
+        }
+        .btn-confirm {
+            background-color: #007bff;
+        }
+        .btn-logout {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            background-color: #dc3545;
+            color: white;
+            border-radius: 5px;
+            border: none;
+        }
+        .alert-error {
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+            color: #721c24;
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+        .ui-helper-hidden-accessible { 
+            position: absolute; 
+            bottom: 10px;
+            left: 10px;
+            font-size: 10px; /* Set font size */
+        }
+        .form-control,
+        .dropdown-menu {
+            width: 100%;
+        }
+        textarea {
+            padding: 0.5rem; /* Apply padding of 0.5rem on all sides */
+            resize: vertical; /* Allow vertical resizing */
+            height: 100px; /* Set a fixed height */
+            margin: 0; /* Remove any margins */
+        }
+        .btn-profile {
+            position: fixed;
+            bottom: 20px;
+            right: 150px;
+            padding: 10px 20px;
+            background-color: #004D99; /* Bootstrap success color */
+            color: white;
+            border-radius: 5px;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="nav-bar">
+    <a href="/" class="nav-bar button">Home</a>
+    <a href="/Sellers" class="nav-bar button">Sellers</a>
+    <a href="/Products" class="nav-bar button">Products</a>
+    <a href="/cart" class="nav-bar button">Shopping Cart</a>
+    <a href="/Profile" class="nav-bar button">Profile</a>
+    </div>
+    <div class="container my-5">
+        <div class="row">
+            <div class="col-md-8 offset-md-2">
+                <h3 class="mb-4">New Product</h3>
+                <form method="POST" action="{{ url_for('sellers.post_product', seller_id=seller_id) }}">
+                    {{ form.hidden_tag() }}
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-danger" role="alert">
+                                    {{ message }}
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+
+                    <div class="form-group">
+                        <label for="product-name-input">Product Name</label>
+                        <input type="text" class="form-control" id="product-name-input" autocomplete="off">
+                        <div class="dropdown" id="autocomplete-dropdown">
+                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton" id="autocomplete-results">
+                            </ul>
+                        </div>
+                        {{ form.product_name(class="form-control", id="product-name-selected", style="display: none;") }}
+                        <div id="product-name-warning" class="text-danger" style="display: none;">Please enter product name then select a product name from suggestions.</div>
+                    </div>
+                    <div class="form-group">
+                        <label for="product-cat">Category</label>
+                        <select class="form-control" id="product-cat" name="product_category" style="width: max-content;">
+                            <option value="" selected disabled>Select a category</option>
+                            {% for catkey, name in categories %}
+                                <option value="{{ catkey }}" {% if selected_category == catkey %}selected{% endif %}>{{ name }}</option>
+                            {% endfor %}
+                        </select>
+                        <div id="product-cat-warning" class="text-danger" style="display: none;">Please select a category.</div>
+                    </div>
+                    <div class="form-group">
+                        <label for="product-description">Description</label>
+                        <textarea class="form-control" name="product_description" rows="5" cols="50" wrap="physical" id="product-description"></textarea>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="product-price">Price</label>
+                            {{ form.product_price(class="form-control") }}
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="product-quantity">Quantity</label>
+                            {{ form.product_quantity(class="form-control") }}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="discount-amount">Discount amount (optional)</label>
+                        <select id="discount-amount" name="discount_amount" class="form-control" style="width: max-content;">
+                            <option value=1 selected>No Discount</option>
+                            {% for i in range(95, 1, -5) %}
+                            <option value="{{ i/100 }}">{{ i }} %</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    {{ form.submit(class="btn btn-primary btn-block", value="Post") }}
+                </form>
+            </div>
+        </div>
+    </div>
+    <a href="/Profile" class="btn-profile">Back</a>
+    <a href="/logout" class="btn-logout">Logout</a>
+    <div class="text-script" id="js-results"></div>
+</body>
+<script>
+    $(document).ready(function() {
+    $("#product-name-input").autocomplete({
+        source: function(request, response) {
+            // Fetch autocomplete suggestions from the server
+            $.ajax({
+                url: "/autocomplete",
+                dataType: "json",
+                data: {
+                    term: request.term
+                },
+                success: function(data) {
+                    response(data); // Pass data to response callback
+                    displayOutput(data); // Call the displayOutput function with the data
+                }
+            });
+        },
+        minLength: 2, // Minimum characters before autocomplete starts
+        position: { my: "left top", at: "left bottom" }, // Position the autocomplete dropdown below the textbox
+        open: function(event, ui) {
+            $("#autocomplete-results").empty(); // Clear previous results
+        },
+        appendTo: "#autocomplete-dropdown", // Append dropdown to specified container
+        create: function () {
+            $(this).data('ui-autocomplete')._renderItem = function (ul, item) {
+                return $('<a class="dropdown-item">').text(item.label).appendTo(ul);
+            };
+        },
+        select: function(event, ui) {
+            // Set the value of the textbox to the selected item's label
+            $(this).val(ui.item.label);
+            $("#product-name-selected").val(ui.item.value);
+            return false; // Prevent the default behavior of setting the textbox value
+        }
+    }).data("ui-autocomplete")._renderMenu = function( ul, items ) {
+        var that = this;
+        $.each( items, function( index, item ) {
+            that._renderItemData(ul, item);
+        });
+    };
+});
+$(".btn-save").click(function(event) {
+    var productName = $("#product-name-selected").val();
+    var productCat = $("#product-cat").val();
+    if (productName === "") {
+        event.preventDefault(); // Prevent form submission
+        $("#product-name-warning").show(); // Show the warning message
+    } else {
+        $("#product-name-warning").hide(); // Hide the warning message
+    }
+    if (productCat === "") {
+        event.preventDefault(); // Prevent form submission
+        $("#product-cat-warning").show(); // Show the warning message
+    } else {
+        $("#product-cat-warning").hide(); // Hide the warning message
+    }
+});
+</script>
+</html>

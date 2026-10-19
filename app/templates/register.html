@@ -1,0 +1,144 @@
+{% block content %}
+<style>
+    body {
+        font-family: Arial, sans-serif;
+    }
+    .container {
+        max-width: 400px;
+        margin: 0 auto;
+        padding: 20px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+    }
+    .container_flash {
+        max-width: 400px;
+        margin: 0 auto;
+        padding: 20px;
+        border-radius: 8px;
+    }
+    .form-group {
+        margin-bottom: 20px;
+    }
+    .form-group label {
+        display: block;
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+    .form-group input {
+        width: 100%;
+        padding: 10px;
+        font-size: 16px;
+        border-radius: 4px;
+        border: 1px solid #ddd;
+    }
+    .error-message {
+        color: red;
+        font-size: 14px;
+        margin-top: 5px;
+    }
+    .btn {
+        display: inline-block;
+        width: 120px;
+        padding: 10px 20px;
+        border-radius: 5px;
+        border: none;
+        color: white;
+        cursor: pointer;
+        text-align: center;
+    }
+    .btn-black {
+        background-color: black;
+    }
+    .btn-secondary {
+        background-color: #3889d0;
+        position: absolute;
+        top: 20px;
+        right: 20px;
+    }
+    .alert-error {
+        background-color: #f8d7da;
+        border-color: #f5c6cb;
+        color: #721c24;
+        padding: 10px;
+        margin-bottom: 20px;
+        border-radius: 5px;
+    }
+</style>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        <div class="container_flash mt-4">
+            {% for category, message in messages %}
+                <div class="alert-error" role="alert">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endwith %}
+
+<div class="container">
+    <h1>Register</h1>
+    <form action="" method="post">
+        {{ form.hidden_tag() }}
+        <div class="form-group">
+            {{ form.firstname(size=32, class_="form-control", placeholder="First Name") }}<br/>
+            {% for error in form.firstname.errors %}
+                <span class="error-message">[{{ error }}]</span>
+            {% endfor %}
+        </div>
+        <div class="form-group">
+            {{ form.lastname(size=32, class_="form-control", placeholder="Last Name") }}<br/>
+            {% for error in form.lastname.errors %}
+                <span class="error-message">[{{ error }}]</span>
+            {% endfor %}
+        </div>
+        <div class="form-group">
+            {{ form.email(size=64, class_="form-control", placeholder="Email") }}<br/>
+            {% for error in form.email.errors %}
+                <span class="error-message">[{{ error }}]</span>
+            {% endfor %}
+        </div>
+        <div class="form-group">
+            {{ form.password(size=32, class_="form-control", placeholder="Password") }}<br/>
+            {% for error in form.password.errors %}
+                <span class="error-message">[{{ error }}]</span>
+            {% endfor %}
+        </div>
+        <div class="form-group">
+            {{ form.password2(size=32, class_="form-control", placeholder="Confirm Password") }}<br/>
+            {% for error in form.password2.errors %}
+                <span class="error-message">[{{ error }}]</span>
+            {% endfor %}
+        </div>
+        <div class="form-group">
+            {{ form.address_number(size=32, class_="form-control", placeholder="Street Number") }}<br/>
+            {% for error in form.address_number.errors %}
+                <span class="error-message">[{{ error }}]</span>
+            {% endfor %}
+        </div>
+        <div class="form-group">
+            {{ form.address_street(size=32, class_="form-control", placeholder="Street Name") }}<br/>
+            {% for error in form.address_street.errors %}
+                <span class="error-message">[{{ error }}]</span>
+            {% endfor %}
+        </div>
+        <div class="form-group">
+            {{ form.address_zip(size=32, class_="form-control", placeholder="Zipcode") }}<br/>
+            {% for error in form.address_zip.errors %}
+                <span class="error-message">[{{ error }}]</span>
+            {% endfor %}
+        </div>
+        <div class="form-group">
+            {{ form.starting_balance(size=32, class_="form-control", placeholder="Starting Balance") }}<br/>
+            {% for error in form.starting_balance.errors %}
+                <span class="error-message">[{{ error }}]</span>
+            {% endfor %}
+        </div>
+        <div class="form-group">
+            {{ form.submit(class_="btn btn-black") }}
+        </div>
+    </form>
+</div>
+<a class="btn btn-secondary" href="{{ url_for('users.login') }}" role="button">Login</a>
+{% endblock %}

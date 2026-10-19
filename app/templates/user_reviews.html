@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Seller Reviews Page</title>
+  <style>
+    /* Basic Reset */
+    body, h1, ul, li, div {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        font-family: Arial, sans-serif;
+    }
+
+    /* Styling for the top navigation bar */
+    .nav-bar {
+        display: flex;
+        justify-content: space-around;
+        padding: 10px;
+        background: #f0f0f0;
+        text-decoration: none;
+        color: inherit;
+    }
+
+    .nav-bar button {
+        padding: 10px;
+        border: none;
+        background: none;
+        font-size: 1em;
+    }
+
+  .nav-bar.button:hover {
+      background-color: #727272; /* Darkens button on hover */
+  }
+
+    .container {
+      padding: 20px;
+    }
+
+    .search-box {
+      display: flex;
+      justify-content: start;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .search-box input {
+      padding: 10px;
+      margin-left: 10px;
+      margin-right: 10px;
+      border: 1px solid #ddd;
+      flex-grow: 1;
+      max-width: 300px;
+    }
+
+    .review-list {
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
+
+    .review-list button {
+      margin: 5px;
+      padding: 5px 10px;
+      border: 1px solid #ddd;
+    }
+
+    .review-list table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+
+    .review-list th, .review-list td {
+      text-align: left;
+      padding: 10px;
+      border-bottom: 1px solid #ddd;
+    }
+
+    thead th {
+      background-color: #004D99;
+      color: white;
+      padding: 10px;
+    }
+
+    .link-style {
+      background: none;
+      border: none;
+      color: blue;
+      text-decoration: underline;
+      cursor: pointer;
+      padding: 0;
+      font-family: inherit;
+      font-size: inherit;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="nav-bar">
+    <a href="/" class="nav-bar button">Home</a>
+    <a href="/Sellers" class="nav-bar button">Sellers</a>
+    <a href="/Products" class="nav-bar button">Products</a>
+    <a href="/cart" class="nav-bar button">Shopping Cart</a>
+    <a href="/Profile" class="nav-bar button">Profile</a>
+  </div>
+
+    <div class="container">
+    <div class="review-list">
+        <label for="review-list"><h3>User Reviews</h3></label>
+        <div class="controls">
+          <form action="{{ url_for('reviews.get_user_user_reviews') }}" method="get">
+            <label for="sort">Sort By:</label>
+            <select name="sort" onchange="this.form.submit()">
+                <option value="rating_desc" {{ 'selected' if sort_order == 'rating_desc' else '' }}>Highest Rating</option>
+                <option value="rating_asc" {{ 'selected' if sort_order == 'rating_asc' else '' }}>Lowest Rating</option>
+                <option value="date_desc" {{ 'selected' if sort_order == 'date_desc' else '' }}>Newest First</option>
+                <option value="date_asc" {{ 'selected' if sort_order == 'date_asc' else '' }}>Oldest First</option>
+                <option value="name_asc" {{ 'selected' if sort_order == 'name_asc' else '' }}>User Name A-Z</option>
+                <option value="name_desc" {{ 'selected' if sort_order == 'name_desc' else '' }}>User Name Z-A</option>
+            </select>
+          </form>
+        </div>
+        <table>
+        <thead>
+            <tr>
+            <th>User Name</th>
+            <th>Rating</th>
+            <th>Description</th>
+            <th>Image</th>
+            </tr>
+        </thead>
+        <tbody>
+          {% for review in reviews %}
+            <tr>
+              <td>{{ review.firstname }}</td>
+              <td>{{ review.review_rating }}</td>
+              <td>{{ review.review_description }}</td>
+              <td><img src="{{ review.review_image }}" alt="{{ review.firstname }}" style="width: 100px; height: 100px;"></td>
+            </tr>
+          {% endfor %}
+        </tbody>        
+      </table>
+    </div>
+  </div>
+
+</body>
+</html>

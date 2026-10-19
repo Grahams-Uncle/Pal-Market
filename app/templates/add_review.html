@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Review</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            padding-top: 50px;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            padding: 20px;
+            background-color: #f8f8f8;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .form-control {
+            height: 45px;
+            font-size: 16px;
+        }
+        .form-group label {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .btn-primary {
+            width: 100%;
+            padding: 10px;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2 class="text-center">Add a Review</h2>
+        <form method="POST" action="{{ url_for('reviews.add_review', order_id=order_id) }}">
+            {{ form.hidden_tag() }}
+            <div class="form-group">
+                <label for="review-rating">Rating (0.0 to 5.0)</label>
+                <input type="number" class="form-control" id="review-rating" name="review_rating" step="0.1" min="0" max="5" required>
+            </div>
+            <div class="form-group">
+                <label for="review-description">Description</label>
+                <textarea class="form-control" id="review-description" name="review_description" rows="5" required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Submit Review</button>
+        </form>
+    </div>
+</body>
+</html>

@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Profile</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+  /* Basic Reset */
+  body, h1, ul, li, div {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      font-family: Arial, sans-serif;
+  }
+
+  /* Styling for the top navigation bar */
+  .nav-bar {
+      display: flex;
+      justify-content: space-around;
+      padding: 10px;
+      background: #f0f0f0;
+      text-decoration: none;
+      color: inherit;
+  }
+
+  .nav-bar button {
+      padding: 10px;
+      border: none;
+      background: none;
+      font-size: 1em;
+  }
+
+  .nav-bar.button:hover {
+      background-color: #727272; /* Darkens button on hover */
+  }
+
+        .btn-save, .btn-convert, .btn-confirm {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            margin-top: 20px;
+            text-align: center;
+            color: white;
+            border-radius: 5px;
+            border: none;
+        }
+        .btn-save {
+            background-color: #007bff;
+        }
+        .btn-convert {
+            background-color: #28a745;
+        }
+        .btn-confirm {
+            background-color: #007bff;
+        }
+        .btn-logout {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            background-color: #dc3545;
+            color: white;
+            border-radius: 5px;
+            border: none;
+        }
+        .alert-error {
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+            color: #721c24;
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="nav-bar">
+        <a href="/" class="nav-bar button">Home</a>
+        <a href="/Sellers" class="nav-bar button">Sellers</a>
+        <a href="/Products" class="nav-bar button">Products</a>
+        <a href="/cart" class="nav-bar button">Shopping Cart</a>
+        <a href="/Profile" class="nav-bar button">Profile</a>
+    </div>
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        <div class="container mt-4">
+            {% for category, message in messages %}
+                <div class="alert-error" role="alert">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endwith %}
+    <div class="container mt-4">
+        <form method="POST" action="{{ url_for('users.edit_profile') }}">
+            {{ form.hidden_tag() }}
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="info-section">
+                        <h3>Edit User Info:</h3>
+                        <div class="form-group">
+                            {{ form.firstname(class="form-control", placeholder="First Name:") }}
+                        </div>
+                        <div class="form-group">
+                            {{ form.lastname(class="form-control", placeholder="Last Name:") }}
+                        </div>
+                        <div class="form-group">
+                            {{ form.email(class="form-control", placeholder="Email:") }}
+                        </div>
+                        <div class="form-group">
+                            {{ form.ship_address_number(class="form-control", placeholder="Shipping Address Street Number:") }}
+                        </div>
+                        <div class="form-group">
+                            {{ form.ship_address_street(class="form-control", placeholder="Shipping Address Street:") }}
+                        </div>
+                        <div class="form-group">
+                            {{ form.ship_address_zip(class="form-control", placeholder="Shipping Address Zipcode:") }}
+                        </div>
+                        <div class="form-group">
+                            {{ form.bill_address_number(class="form-control", placeholder="Billing Address Street Number:") }}
+                        </div>
+                        <div class="form-group">
+                            {{ form.bill_address_street(class="form-control", placeholder="Billing Address Street:") }}
+                        </div>
+                        <div class="form-group">
+                            {{ form.bill_address_zip(class="form-control", placeholder="Billing Address Zipcode:") }}
+                        </div>
+                        {{ form.submit(class="btn-save", value="Save") }}
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="info-section">
+                        <h3>Edit User Bio:</h3>
+                        <div class="form-group">
+                            {{ form.user_bio(class="form-control", rows="4", placeholder="Bio:") }}
+                        </div>
+                        {{ form.submit(class="btn-save", value="Save") }}
+                    </div>
+                    
+                    <div class="info-section">
+                        <h3>Change Password:</h3>
+                        <div class="form-group">
+                            {{ form.old_password(class="form-control", placeholder="Existing Password:") }}
+                        </div>
+                        <div class="form-group">
+                            {{ form.new_password(class="form-control", placeholder="New Password:") }}
+                        </div>
+                        <div class="form-group">
+                            {{ form.new_password2(class="form-control", placeholder="Confirm New Password:") }}
+                        </div>
+                        {{ form.submit(class="btn-save", value="Save") }}
+                    </div>
+                </div>
+            </div>
+        </form>
+        <div class="row">
+            <div class="col-md-12">
+                {% if not user_info.is_seller %}
+                <form method="POST" action="{{ url_for('users.convert_to_seller') }}">
+                    <button type="submit" class="btn-convert">Convert to Seller</button>
+                </form>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</body>
+</html>
